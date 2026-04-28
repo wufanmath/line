@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吳凡數學｜菁英榮譽榜</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入現代無襯線字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="honor.ico">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 網點背景，增加現代科技感 */
+        body {
+            background-color: #fafafa;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* 鎖定 A4 比例 (寬 21 : 高 29.7) */
+        .a4-ratio {
+            aspect-ratio: 210 / 297;
+        }
+
+        /* 隱藏捲動條但保留功能 */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* 平滑浮現動畫 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px) scale(0.98);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* 圖片佔位符優化 */
+        .img-placeholder {
+            background: linear-gradient(120deg, #f3f4f6 0%, #ffffff 50%, #f3f4f6 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="text-gray-900 antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- 頂部導覽列 (毛玻璃效果) -->
+    <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-md border-b border-gray-100 transition-all duration-300" id="navbar">
+        <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <!-- 裝飾性的小圓點 -->
+                <span class="font-bold tracking-wider text-gray-900">吳凡數學</span>
+            </div>
+            <span class="text-sm font-medium text-gray-500"></span>
+        </div>
+    </nav>
+
+    <!-- 標題區塊 (Hero Section) -->
+    <header class="pt-24 pb-10 px-6 text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-4">
+            吳凡學員<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-blue-400">榮譽榜</span>
+        </h1>
+        <p class="text-gray-500 text-base md:text-lg max-w-md mx-auto">
+            見證每一位學子的努力與耀眼成績！
+        </p>
+    </header>
+
+    <!-- 榜單展示區塊 (改由 JavaScript 動態生成) -->
+    <main id="honor-roll-container" class="max-w-2xl mx-auto px-5 pb-32 space-y-10">
+        <!-- 這裡的內容會由下方的 JSON 資料自動載入 -->
+    </main>
+
+    <!-- 簡約頁尾 -->
+    <footer class="border-t border-gray-200 bg-white py-10 text-center">
+        <p class="text-sm font-medium text-gray-400">©Wufan Math All rights reserved.</p>
+    </footer>
+
+    <!-- 回到頂部 (融合在設計中的小按鈕) -->
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+        class="fixed bottom-6 right-6 w-12 h-12 bg-white text-gray-900 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.1)] flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 pointer-events-none hover:bg-gray-50 z-50 border border-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <script>
+        // 頂部導覽列滾動陰影效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                navbar.classList.add('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-sm');
+            }
+        });
+
+        // 控制「回到頂部」按鈕
+        const backToTopBtn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 500) {
+                backToTopBtn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                backToTopBtn.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                backToTopBtn.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            }
+        });
+
+        // --- 1. JSON 資料庫區塊 ---
+        // 之後只要在這裡新增、修改或調整順序，網頁畫面就會自動同步更新
+        const honorRollData = [
+            {
+                year: "115年",
+                title: "繁星推薦榮譽榜心得篇",
+                imageSrc: "115年 繁星推薦榮譽榜心得.png",
+                altText: "115年 繁星推薦榮譽榜心得"
+            },
+            {
+                year: "115年",
+                title: "繁星推薦/特殊選才榮譽榜",
+                imageSrc: "115年 繁星特招榮譽榜.png",
+                altText: "115年 繁星特招榮譽榜"
+            },
+            {
+                year: "114學年度第一學期",
+                title: "第二次段考榮譽榜",
+                imageSrc: "114-1 第二次段考榮譽榜.png",
+                altText: "114-1 第二次段考榮譽榜"
+            },
+            {
+                year: "114學年度第一學期",
+                title: "第一次段考榮譽榜",
+                imageSrc: "114-1 第一次段考榮譽榜.png",
+                altText: "114-1 第一次段考榮譽榜"
+            },
+            {
+                year: "114年",
+                title: "升大學菁英榮譽榜",
+                imageSrc: "114年 升大學精英榮譽榜.png",
+                altText: "114年 升大學精英榮譽"
+            },
+            {
+                year: "113學年度第二學期",
+                title: "第二次段考榮譽榜",
+                imageSrc: "113-2 第二次段考榮譽榜.png",
+                altText: "113-2 第二次段考榮譽榜"
+            },
+            {
+                year: "114年",
+                title: "繁星推薦榮譽榜心得篇",
+                imageSrc: "114年 繁星推薦榮譽榜心得.png",
+                altText: "114年 繁星推薦榮譽榜心得篇"
+            },
+            {
+                year: "114年",
+                title: "繁星推薦/特招榮譽榜",
+                imageSrc: "114年 繁星特招榮譽榜.png",
+                altText: "114年 繁星特招榮譽榜"
+            }
+        ];
+
+        // --- 2. 動態渲染邏輯 ---
+        const container = document.getElementById('honor-roll-container');
+        
+        honorRollData.forEach(item => {
+            const article = document.createElement('article');
+            article.className = 'reveal flex flex-col items-center';
+            article.innerHTML = `
+                <div class="relative w-full group">
+                    <div class="absolute -inset-1 bg-gradient-to-b from-brand-100 to-transparent rounded-3xl blur-lg opacity-50 group-hover:opacity-70 transition duration-500"></div>
+                    <div class="relative w-full bg-white rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50">
+                        <img 
+                            src="${item.imageSrc}" 
+                            alt="${item.altText}" 
+                            class="w-full h-auto a4-ratio object-cover img-placeholder" 
+                            loading="lazy">
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex flex-col items-center text-center">
+                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold tracking-widest mb-1">${item.year}</span>
+                    <h2 class="text-2xl font-bold text-gray-900">${item.title}</h2>
+                </div>
+            `;
+            container.appendChild(article);
+        });
+
+        // --- 3. 現代感平滑浮現動畫 (必須在元素生成後執行) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        document.querySelectorAll('.reveal').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
