@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吳凡數學｜課表檢索</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入現代無襯線字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+ 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 網點背景，增加現代科技感 */
+        body {
+            background-color: #fafafa;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* 隱藏捲動條但保留功能 */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* 平滑浮現動畫 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 鎖定背景滾動 (用於 Modal 出現時) */
+        body.modal-open {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="text-gray-900 antialiased selection:bg-brand-500 selection:text-white modal-open">
+
+    <!-- 迎賓選擇彈窗 (Modal) -->
+    <div id="welcome-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-[90%] mx-auto shadow-2xl transform transition-transform duration-300 scale-100 text-center">
+            <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-black text-gray-900 mb-2">歡迎蒞臨吳凡數學</h2>
+            <p class="text-gray-500 mb-8 font-medium">您想了解哪個年級的課表？</p>
+           
+            <div class="flex flex-col gap-3">
+                <button onclick="initSelection('grade1')" class="w-full py-3.5 rounded-xl bg-gray-50 hover:bg-brand-50 text-gray-700 hover:text-brand-600 font-bold border border-gray-200 hover:border-brand-200 transition-all duration-200 group flex items-center justify-center gap-2">
+                    高一課表
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+                <button onclick="initSelection('grade2')" class="w-full py-3.5 rounded-xl bg-gray-50 hover:bg-brand-50 text-gray-700 hover:text-brand-600 font-bold border border-gray-200 hover:border-brand-200 transition-all duration-200 group flex items-center justify-center gap-2">
+                    高二課表
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+                <button onclick="initSelection('grade3')" class="w-full py-3.5 rounded-xl bg-gray-50 hover:bg-brand-50 text-gray-700 hover:text-brand-600 font-bold border border-gray-200 hover:border-brand-200 transition-all duration-200 group flex items-center justify-center gap-2">
+                    高三課表
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部導覽列 (毛玻璃效果) -->
+    <nav class="fixed top-0 w-full z-40 bg-white/70 backdrop-blur-md border-b border-gray-100 transition-all duration-300" id="navbar">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="font-bold tracking-wider text-gray-900">吳凡數學</span>
+            </div>
+            <span class="text-sm font-medium text-gray-500">課表查詢系統</span>
+        </div>
+    </nav>
+
+    <!-- 標題區塊 -->
+    <header class="pt-28 pb-8 px-6 text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 mb-4">
+            最新開課<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-blue-400">時程表</span>
+        </h1>
+        <p class="text-gray-500 text-base md:text-lg max-w-md mx-auto mb-10">
+            選擇年級，查看詳細的上課時間與授課師資
+        </p>
+
+        <!-- 膠囊型左右選單 (三個選項) -->
+        <div class="flex justify-center overflow-x-auto pb-4 -mb-4 px-4 sm:px-0">
+            <div class="bg-gray-200/70 p-1.5 rounded-full inline-flex relative shadow-inner shrink-0">
+                <button id="tab-grade1" onclick="switchTab('grade1')" class="px-5 sm:px-8 py-2.5 rounded-full text-sm font-bold bg-white text-brand-600 shadow-[0_2px_8px_rgb(0,0,0,0.08)] transition-all duration-300 whitespace-nowrap text-center">
+                    高一
+                </button>
+                <button id="tab-grade2" onclick="switchTab('grade2')" class="px-5 sm:px-8 py-2.5 rounded-full text-sm font-medium text-gray-500 hover:text-gray-700 transition-all duration-300 whitespace-nowrap text-center">
+                    高二
+                </button>
+                <button id="tab-grade3" onclick="switchTab('grade3')" class="px-5 sm:px-8 py-2.5 rounded-full text-sm font-medium text-gray-500 hover:text-gray-700 transition-all duration-300 whitespace-nowrap text-center">
+                    高三
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 課表卡片展示區塊 (動態生成) -->
+    <main class="max-w-4xl mx-auto px-6 pb-32">
+        <!-- 使用 Grid 佈局，手機 1 欄，平板以上 2 欄 -->
+        <div id="schedule-container" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <!-- 這裡的內容會由下方的 JSON 資料自動載入 -->
+        </div>
+       
+        <!-- 無資料時的提示區塊 (隱藏) -->
+        <div id="empty-state" class="hidden text-center py-20">
+            <p class="text-gray-400 font-medium text-lg">目前該年級尚無開課資訊</p>
+        </div>
+    </main>
+
+    <!-- 簡約頁尾 -->
+    <footer class="border-t border-gray-200 bg-white py-10 text-center mt-auto">
+        <p class="text-sm font-medium text-gray-400">Copyright © 2026. Wufan Math All rights reserved.</p>
+    </footer>
+
+    <!-- 回到頂部 -->
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+        class="fixed bottom-6 right-6 w-12 h-12 bg-white text-gray-900 rounded-full shadow-[0_4px_20px_rgb(0,0,0,0.1)] flex items-center justify-center opacity-0 translate-y-4 transition-all duration-300 pointer-events-none hover:bg-gray-50 z-40 border border-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+        </svg>
+    </button>
+
+    <script>
+        // 頂部導覽列滾動陰影效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                navbar.classList.add('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-sm');
+            }
+        });
+
+        // 控制「回到頂部」按鈕
+        const backToTopBtn = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                backToTopBtn.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                backToTopBtn.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            }
+        });
+
+        // --- 1. 課表 JSON 資料庫 ---
+        // 可以在這裡修改您的真實課表資訊
+        const scheduleData = {
+            grade1: [
+                {
+                    className: "數學菁英班（進度A班）",
+                    time: "每週六 13:30 - 16:30",
+                    time2: "",
+                    teacherAlias: "吳凡",
+                    teacherRealName: "池偉誠",
+                    remark: ""
+                },
+                {
+                    className: "數學菁英班（進度B班）",
+                    time: "每週五 18:30 - 21:30",
+                    teacherAlias: "吳凡",
+                    teacherRealName: "池偉誠"
+                },
+                {
+                    className: "英文頂標班",
+                    time: "每週二 18:30 - 21:30",
+                    teacherAlias: "吳艾",
+                    teacherRealName: "吳寧"
+                },
+                {
+                    className: "物理超修班",
+                    time: "每週六 18:00 - 21:00",
+                    teacherAlias: "宏泰團隊-或豪",
+                    teacherRealName: "張彧豪"
+                },
+                {
+                    className: "化學資優班",
+                    time: "每週四 18:30 - 21:30",
+                    teacherAlias: "宏泰團隊-宇翔",
+                    teacherRealName: "林賢曜",
+                    remark: ""
+                }
+            ],
+            grade2: [
+                {
+                    className: "數學菁英班（進度A班）",
+                    time: "每週三 18:30 - 21:30",
+                    time2: "",
+                    teacherAlias: "吳凡",
+                    teacherRealName: "池偉誠"
+                },
+                {
+                    className: "數學菁英班（進度B班）",
+                    time: "每週四 18:30 - 21:30",
+                    teacherAlias: "葦倫",
+                    teacherRealName: "陳葦倫"
+                },
+                {
+                    className: "英文頂標班",
+                    time: "每週五 18:30 - 21:30",
+                    teacherAlias: "吳艾",
+                    teacherRealName: "吳寧"
+                },
+                {
+                    className: "物理超修班",
+                    time: "每週ㄧ 18:00 - 21:00",
+                    teacherAlias: "宏泰團隊-張鈜",
+                    teacherRealName: "張宏村"
+                },
+                {
+                    className: "化學資優班",
+                    time: "每週六 09:30 - 12:30",
+                    teacherAlias: "宏泰團隊-宇翔",
+                    teacherRealName: "林賢曜"
+                }
+            ],
+            grade3: [
+                {
+                    className: "數學A總複習",
+                    time: "每週四 18:30 - 21:30",
+                    time2: "每週六 18:00 - 21:00",
+                    teacherAlias: "吳凡",
+                    teacherRealName: "池偉誠",
+                    remark: "暑期安排密集複習，開學後每週一堂"
+                },
+                {
+                    className: "數學B總複習",
+                    time: "每週四 18:30 - 21:30",
+                    time2: "每週六 18:00 - 21:00",
+                    teacherAlias: "吳凡",
+                    teacherRealName: "池偉誠",
+                    remark: "暑期安排密集複習，開學後每週一堂"
+                },
+                {
+                    className: "英文科總複習",
+                    time: "每週ㄧ 18:30 - 21:30",
+                    teacherAlias: "吳艾",
+                    teacherRealName: "吳寧"
+                },
+                {
+                    className: "國文科總複習",
+                    time: "每週六 13:30 - 16:30",
+                    teacherAlias: "潘儒",
+                    teacherRealName: "潘儒"
+                },
+                {
+                    className: "自然科總複習",
+                    time: "每週二 18:30 - 21:30",
+                    teacherAlias: "宏泰團隊",
+                    teacherRealName: "",
+                    remark: "詳細上課時間請見自然科課表"
+                }
+            ]
+        };
+
+        // --- 2. 現代感平滑浮現動畫的觀察器 ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -20px 0px"
+        });
+
+        // --- 3. 動態渲染卡片邏輯 ---
+        const container = document.getElementById('schedule-container');
+        const emptyState = document.getElementById('empty-state');
+       
+        function renderSchedule(grade) {
+            container.innerHTML = '';
+            const classes = scheduleData[grade];
+
+            if (!classes || classes.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            classes.forEach((item, index) => {
+                const card = document.createElement('div');
+                // 加入 delay 讓卡片一張一張浮現
+                card.style.transitionDelay = `${index * 100}ms`;
+                card.className = 'reveal bg-white rounded-2xl p-7 border border-gray-100 shadow-[0_2px_15px_rgb(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgb(59,130,246,0.08)] hover:-translate-y-1 transition-all duration-300 group';
+               
+                // 處理第二個時間 (可選)
+                const time2Html = item.time2 ? `
+                    <div class="flex items-start gap-3 text-gray-600 mt-2">
+                        <div class="h-6 w-6 shrink-0"></div> <!-- 留白以對齊第一個時間 -->
+                        <span class="font-medium text-lg tracking-wide">${item.time2}</span>
+                    </div>
+                ` : '';
+
+                // 處理備註欄位 (可選)
+                const remarkHtml = item.remark ? `
+                    <div class="mt-4 bg-brand-50/50 rounded-xl p-3.5 border border-brand-100/50">
+                        <p class="text-sm text-gray-600 flex items-start gap-2.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 mt-0.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="leading-relaxed font-medium">${item.remark}</span>
+                        </p>
+                    </div>
+                ` : '';
+
+                card.innerHTML = `
+                    <div class="flex flex-col h-full justify-between">
+                        <div>
+                            <!-- 1. 班別 -->
+                            <h3 class="text-2xl md:text-3xl font-black text-gray-900 mb-4 group-hover:text-brand-600 transition-colors duration-300">
+                                ${item.className}
+                            </h3>
+                           
+                            <div class="space-y-2">
+                                <!-- 2. 授課時間 1 -->
+                                <div class="flex items-start gap-3 text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-brand-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span class="font-medium text-lg tracking-wide">${item.time}</span>
+                                </div>
+                                <!-- 授課時間 2 (如果有填寫就會顯示) -->
+                                ${time2Html}
+                            </div>
+                        </div>
+                       
+                        <div>
+                            <!-- 3. 授課老師與本名標籤 -->
+                            <div class="mt-5 pt-5 border-t border-gray-100/80 flex items-center gap-3">
+                                <div class="bg-brand-50 p-2 rounded-full text-brand-600 shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <div class="flex items-center flex-wrap gap-2">
+                                    <span class="text-xl font-bold text-gray-800">${item.teacherAlias}老師</span>
+                                    <span class="bg-gray-100/80 text-gray-600 text-xs px-2.5 py-1.5 rounded-lg font-medium tracking-wider border border-gray-200">
+                                        本名 / ${item.teacherRealName}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- 4. 備註欄位 (如果有填寫就會顯示) -->
+                            ${remarkHtml}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // 重新綁定動畫觀察器
+            document.querySelectorAll('.reveal').forEach((el) => {
+               observer.observe(el);
+            });
+        }
+
+        // --- 4. 切換選單邏輯 ---
+        function switchTab(grade) {
+            const tabs = {
+                'grade1': document.getElementById('tab-grade1'),
+                'grade2': document.getElementById('tab-grade2'),
+                'grade3': document.getElementById('tab-grade3')
+            };
+
+            // 定義啟動和未啟動的樣式
+            const activeClass = ['font-bold', 'bg-white', 'text-brand-600', 'shadow-[0_2px_8px_rgb(0,0,0,0.08)]'];
+            const inactiveClass = ['font-medium', 'text-gray-500', 'hover:text-gray-700', 'bg-transparent', 'shadow-none'];
+
+            // 更新所有 Tab 樣式
+            for (const key in tabs) {
+                if (key === grade) {
+                    tabs[key].classList.remove(...inactiveClass);
+                    tabs[key].classList.add(...activeClass);
+                } else {
+                    tabs[key].classList.remove(...activeClass);
+                    tabs[key].classList.add(...inactiveClass);
+                }
+            }
+
+            // 渲染對應卡片
+            renderSchedule(grade);
+        }
+
+        // --- 5. 迎賓視窗邏輯 ---
+        function initSelection(grade) {
+            const modal = document.getElementById('welcome-modal');
+            const body = document.body;
+
+            // 淡出動畫
+            modal.style.opacity = '0';
+            modal.querySelector('div').style.transform = 'scale(0.95)';
+           
+            // 延遲移除 DOM 以配合 CSS 轉場
+            setTimeout(() => {
+                modal.style.display = 'none';
+                body.classList.remove('modal-open'); // 恢復背景捲動
+                switchTab(grade); // 觸發選擇的年級
+            }, 300);
+        }
+
+        // 初始化：背景預設載入高一，但被 Modal 蓋住
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSchedule('grade1');
+        });
+
+    </script>
+</body>
+</html>
