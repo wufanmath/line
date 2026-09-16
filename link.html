@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吳凡數學 | 官方連結樹</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入現代無襯線字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 網點背景，增加現代科技感 */
+        body {
+            background-color: #fafafa;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* 隱藏捲動條但保留功能 */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
+        /* 平滑浮現動畫 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* 頭像外圈旋轉動畫 */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-900 antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- 頂部裝飾 (可選的微小品牌列，符合原設計架構) -->
+    <nav class="w-full z-50 bg-white/50 backdrop-blur-md border-b border-gray-100 sticky top-0">
+        <div class="max-w-lg mx-auto px-6 py-3 text-center">
+            <span class="font-bold tracking-wider text-gray-800 text-sm">吳凡數學</span>
+        </div>
+    </nav>
+
+    <!-- 個人資訊區塊 (Hero Section) -->
+    <header class="pt-12 pb-8 px-6 text-center max-w-lg mx-auto flex flex-col items-center reveal active">
+        <!-- 頭像 -->
+        <div class="relative w-28 h-28 mb-5 group">
+            <!-- 裝飾性漸層外圈 -->
+            <div class="absolute -inset-1 bg-gradient-to-tr from-brand-500 to-blue-300 rounded-full blur-md opacity-60 group-hover:opacity-100 transition duration-500 animate-spin-slow"></div>
+            <!-- 實際頭像圖片 (這裡用漸層佔位代替) -->
+            <div class="relative w-full h-full bg-white rounded-full p-1 shadow-md">
+                <div class="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
+                    <!-- 若有真實Logo，替換此處的 span 為 img 標籤 -->
+                    <span class="text-2xl font-black text-gray-400">WF</span>
+                </div>
+            </div>
+        </div>
+        
+        <h1 class="text-2xl font-black tracking-tight text-gray-900 mb-2">
+            吳凡數學<br>Wufan Math
+        </h1>
+    </header>
+
+    <!-- 連結展示區塊 (由 JavaScript 動態生成) -->
+    <main class="max-w-lg mx-auto px-5 pb-10 w-full flex-grow flex flex-col gap-4" id="links-container">
+        <!-- 這裡的內容會由下方的 JSON 資料自動載入 -->
+    </main>
+
+    <!-- 簡約頁尾 -->
+    <footer class="mt-auto border-t border-gray-200 bg-white py-8 text-center">
+        <p class="text-xs font-medium text-gray-400">Copyright © 2026. Wufan Math All rights reserved.</p>
+    </footer>
+
+    <script>
+        // --- 1. JSON 資料庫區塊 ---
+        // 在這裡新增或修改您的連結，網頁會自動依照順序渲染
+        const linksData = [
+            {
+                title: "吳凡數學官方網站",
+                subtitle: "了解教學理念、師資陣容與歷年榜單",
+                url: "https://www.wufanmath.com/",
+                icon: "🏠",
+                style: "brand" // 品牌主色藍
+            },
+            {
+                title: "官方LINE諮詢 / 預約試聽",
+                subtitle: "任何課程問題，歡迎隨時與我們聯繫",
+                url: "https://lin.ee/WpL0Tid",
+                icon: "💬",
+                style: "line" // LINE 專屬綠色
+            },
+            {
+                title: "最新榮譽榜",
+                subtitle: "見證每一位學子的努力與耀眼成績",
+                url: "https://wufanmath.github.io/line/honor.html",
+                icon: "🏆",
+                style: "default"
+            },
+            {
+                title: "最新課表",
+                subtitle: "查看各年級開課班級與上課時間",
+                url: "https://wufanmath.github.io/line/curriculum.html",
+                icon: "📅",
+                style: "default"
+            },
+            {
+                title: "高三學測班專區",
+                subtitle: "衝刺學測，全方位複習計畫",
+                url: "https://wufanmath.github.io/line/test.html",
+                icon: "🎯",
+                style: "default"
+            },
+            {
+                title: "高一 / 高二新生專區",
+                subtitle: "奠定扎實基礎，迎戰段考與大考",
+                url: "https://wufanmath.github.io/line/new.html",
+                icon: "🌱",
+                style: "default"
+            }
+        ];
+
+        // --- 2. 動態渲染邏輯 ---
+        const container = document.getElementById('links-container');
+        
+        linksData.forEach((link, index) => {
+            const linkWrapper = document.createElement('div');
+            // 加入 delay 讓動畫有層次感
+            linkWrapper.className = `reveal w-full`;
+            linkWrapper.style.transitionDelay = `${index * 100}ms`; // 階梯式延遲
+
+            // 判斷按鈕樣式 (品牌藍、LINE綠、預設白)
+            let cardClass, subtitleClass, iconBgClass;
+            const isHighlighted = link.style !== "default";
+            
+            if (link.style === "line") {
+                // LINE 官方綠色 #06C755，文字改為深黑色提升對比與辨識度
+                cardClass = "bg-[#06C755] text-gray-900 shadow-[0_8px_20px_rgba(6,199,85,0.3)] hover:bg-[#05b34c] border-transparent";
+                subtitleClass = "text-gray-800/90";
+                iconBgClass = "bg-white/40"; // 圖示底色改為半透明白，襯托綠色
+            } else if (link.style === "brand") {
+                // 品牌藍色
+                cardClass = "bg-brand-500 text-white shadow-[0_8px_20px_rgba(59,130,246,0.3)] hover:bg-brand-600 border-transparent";
+                subtitleClass = "text-brand-100";
+                iconBgClass = "bg-brand-600/50";
+            } else {
+                // 預設白色
+                cardClass = "bg-white/80 backdrop-blur-md text-gray-800 shadow-sm border border-gray-200/80 hover:bg-white hover:border-gray-300";
+                subtitleClass = "text-gray-500";
+                iconBgClass = "bg-gray-50";
+            }
+
+            linkWrapper.innerHTML = `
+                <a href="${link.url}" target="_blank" rel="noopener noreferrer" 
+                   class="group flex items-center p-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${cardClass} relative overflow-hidden">
+                   
+                    <!-- 裝飾用背景光暈 (僅對強調按鈕有明顯效果) -->
+                    ${isHighlighted ? '<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>' : ''}
+
+                    <div class="flex items-center justify-center w-12 h-12 rounded-xl text-xl ${iconBgClass} shrink-0 transition-transform duration-300 group-hover:scale-110">
+                        ${link.icon}
+                    </div>
+                    
+                    <div class="ml-4 flex-grow text-left">
+                        <h2 class="text-[17px] font-bold leading-tight">${link.title}</h2>
+                        ${link.subtitle ? `<p class="text-xs mt-1 font-medium ${subtitleClass}">${link.subtitle}</p>` : ''}
+                    </div>
+
+                    <div class="shrink-0 ml-2 opacity-50 group-hover:opacity-100 transition-opacity duration-300 group-hover:translate-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </a>
+            `;
+            container.appendChild(linkWrapper);
+        });
+
+        // --- 3. 現代感平滑浮現動畫 (必須在元素生成後執行) ---
+        // 當畫面捲動到時觸發，但因為 Linktree 通常是一頁式，大部分一開始就會觸發
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 給一點延遲讓畫面載入更順暢
+                    setTimeout(() => {
+                        entry.target.classList.add('active');
+                    }, 50);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -20px 0px"
+        });
+
+        document.querySelectorAll('.reveal').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
